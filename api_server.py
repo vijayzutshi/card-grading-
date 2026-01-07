@@ -2,14 +2,20 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
 import shutil
-from card_centering import analyze_centering  # import your function
+from card_centering import analyze_centering  # your centering logic
 
 app = FastAPI()
 
+# -----------------------------
+# Request Model
+# -----------------------------
 class CenteringRequest(BaseModel):
     front_image_url: str
     back_image_url: str
 
+# -----------------------------
+# Helper: Download images
+# -----------------------------
 def download_image(url, filename):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
@@ -18,6 +24,16 @@ def download_image(url, filename):
     else:
         raise Exception(f"Failed to download image: {url}")
 
+# -----------------------------
+# Root Route (Fixes 404 + Swagger redirect)
+# -----------------------------
+@app.get("/")
+def read_root():
+    return {"message": "Card Grading API is live!"}
+
+# -----------------------------
+# Main API Endpoint
+# -----------------------------
 @app.post("/analyze_centering")
 def analyze(req: CenteringRequest):
     # Download images
