@@ -28,6 +28,9 @@ def read_root():
 @app.post("/analyze_centering")
 def analyze(req: CenteringRequest):
 
+    print("DOWNLOADING FRONT:", req.front_image_url)
+    print("DOWNLOADING BACK:", req.back_image_url)
+
     # Download images with unique filenames
     front_path = download_image(req.front_image_url)
     back_path = download_image(req.back_image_url)
@@ -36,3 +39,4 @@ def analyze(req: CenteringRequest):
     result = analyze_centering(front_path, back_path)
 
     return result
+
