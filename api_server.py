@@ -2,45 +2,37 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
 import shutil
-from card_centering import analyze_centering  # your centering logic
+import uuid
+from card_centering import analyze_centering
 
 app = FastAPI()
 
-# -----------------------------
-# Request Model
-# -----------------------------
 class CenteringRequest(BaseModel):
     front_image_url: str
     back_image_url: str
 
-# -----------------------------
-# Helper: Download images
-# -----------------------------
-def download_image(url, filename):
+def download_image(url):
+    filename = f"{uuid.uuid4()}.png"   # unique filename every time
     response = requests.get(url, stream=True)
     if response.status_code == 200:
         with open(filename, "wb") as out_file:
             shutil.copyfileobj(response.raw, out_file)
+        return filename
     else:
         raise Exception(f"Failed to download image: {url}")
 
-# -----------------------------
-# Root Route (Fixes 404 + Swagger redirect)
-# -----------------------------
 @app.get("/")
 def read_root():
     return {"message": "Card Grading API is live!"}
 
-# -----------------------------
-# Main API Endpoint
-# -----------------------------
 @app.post("/analyze_centering")
 def analyze(req: CenteringRequest):
-    # Download images
-    download_image(req.front_image_url, "front_temp.png")
-    download_image(req.back_image_url, "back_temp.png")
+
+    # Download images with unique filenames
+    front_path = download_image(req.front_image_url)
+    back_path = download_image(req.back_image_url)
 
     # Run your centering logic
-    result = analyze_centering("front_temp.png", "back_temp.png")
+    result = analyze_centering(front_path, back_path)
 
     return result
