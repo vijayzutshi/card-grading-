@@ -4,7 +4,7 @@ import requests
 import shutil
 import uuid
 from card_centering import analyze_centering
-
+from fastapi.responses import JSONResponse
 app = FastAPI()
 
 class CenteringRequest(BaseModel):
@@ -30,6 +30,9 @@ def analyze(req: CenteringRequest):
 
     print("DOWNLOADING FRONT:", req.front_image_url)
     print("DOWNLOADING BACK:", req.back_image_url)
+    result = analyze_centering(front_path, back_path)
+    print("RETURNING RESULT:", result) # Add this line 
+    return JSONResponse(content=result) # Ensure this is used
 
     # Download images with unique filenames
     front_path = download_image(req.front_image_url)
@@ -39,4 +42,5 @@ def analyze(req: CenteringRequest):
     result = analyze_centering(front_path, back_path)
 
     return result
+
 
