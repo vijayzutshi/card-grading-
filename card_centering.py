@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 # ---------------------------------------------------------
 # 1. Detect outer border of the card
 # ---------------------------------------------------------
@@ -20,7 +19,6 @@ def detect_card_border(image):
 
     x, y, w, h = cv2.boundingRect(approx)
     return x, y, w, h
-
 
 # ---------------------------------------------------------
 # 2. Detect inner artwork rectangle
@@ -46,7 +44,6 @@ def detect_artwork_rectangle(image, outer_box):
 
     return ox + ax, oy + ay, aw, ah
 
-
 # ---------------------------------------------------------
 # 3. Compute border thickness
 # ---------------------------------------------------------
@@ -66,7 +63,6 @@ def compute_border_thickness(outer, inner):
         "bottom": float(bottom)
     }
 
-
 # ---------------------------------------------------------
 # 4. Compute PSA-style axis ratio
 # ---------------------------------------------------------
@@ -78,7 +74,6 @@ def compute_psa_axis_ratio(border_a, border_b):
     worse = min(border_a, border_b)
     ratio = worse / total
     return ratio * 100.0
-
 
 def compute_psa_centering_ratio_from_borders(borders):
     left = borders["left"]
@@ -99,7 +94,6 @@ def compute_psa_centering_ratio_from_borders(borders):
 
     return limiting_ratio, details
 
-
 # ---------------------------------------------------------
 # 5. Map PSA ratios to centering grade
 # ---------------------------------------------------------
@@ -118,9 +112,8 @@ def map_psa_centering_grade(front_ratio, back_ratio):
         return 5
     return 4
 
-
 # ---------------------------------------------------------
-# 6. FINAL FUNCTION (with new ratio fields added)
+# 6. FINAL FUNCTION — FULL RESPONSE RESTORED
 # ---------------------------------------------------------
 def analyze_centering(front_path: str, back_path: str) -> dict:
 
@@ -148,45 +141,40 @@ def analyze_centering(front_path: str, back_path: str) -> dict:
     centering_grade = map_psa_centering_grade(front_center_ratio, back_center_ratio)
 
     # ---------------- NEW FIELDS ----------------
-    # Front
     front_left = 100 - front_center_ratio
     front_right = front_center_ratio
     frontRatioString = f"{int(front_left)}/{int(front_right)}"
     frontRatioValue = front_right / 100.0
 
-    # Back
     back_left = 100 - back_center_ratio
     back_right = back_center_ratio
     backRatioString = f"{int(back_left)}/{int(back_right)}"
     backRatioValue = back_right / 100.0
 
-    # ---------------- RESULT ----------------
-    result = {
+    # ---------------- RESULT — FULL STRUCTURE ----------------
+    return {
+        "psa_grade": f"Gem Mint {centering_grade}",
+        "ratio": round(front_center_ratio, 2),
+        "centered": front_center_ratio >= 45.0,
+
         "front": {
             "outer_border": front_outer,
             "artwork_rectangle": front_inner,
             "borders": front_borders,
             "ratios": front_ratio_details,
-            "psa_centering_ratio": front_center_ratio
+            "psa_centering_ratio": front_center_ratio,
+            "ratio_string": frontRatioString,
+            "ratio_value": frontRatioValue
         },
+
         "back": {
             "outer_border": back_outer,
             "artwork_rectangle": back_inner,
             "borders": back_borders,
             "ratios": back_ratio_details,
-            "psa_centering_ratio": back_center_ratio
-        },
-        "summary": {
-            "frontCenteringRatio": front_center_ratio,
-            "backCenteringRatio": back_center_ratio,
-            "centeringGrade": centering_grade,
-
-            # NEW FIELDS FOR FLUTTERFLOW
-            "frontRatioString": frontRatioString,
-            "backRatioString": backRatioString,
-            "frontRatioValue": frontRatioValue,
-            "backRatioValue": backRatioValue
+            "psa_centering_ratio": back_center_ratio,
+            "ratio_string": backRatioString,
+            "ratio_value": backRatioValue
         }
     }
 
-    return result
