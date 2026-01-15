@@ -113,7 +113,7 @@ def map_psa_centering_grade(front_ratio, back_ratio):
     return 4
 
 # ---------------------------------------------------------
-# 6. FINAL FUNCTION (with top-level fields for FastAPI)
+# 6. FINAL FUNCTION — FULL RESPONSE RESTORED
 # ---------------------------------------------------------
 def analyze_centering(front_path: str, back_path: str) -> dict:
 
@@ -151,11 +151,12 @@ def analyze_centering(front_path: str, back_path: str) -> dict:
     backRatioString = f"{int(back_left)}/{int(back_right)}"
     backRatioValue = back_right / 100.0
 
-    # ---------------- RESULT ----------------
+    # ---------------- RESULT — FULL STRUCTURE ----------------
     return {
         "psa_grade": f"Gem Mint {centering_grade}",
         "ratio": round(front_center_ratio, 2),
         "centered": front_center_ratio >= 45.0,
+
         "front": {
             "outer_border": front_outer,
             "artwork_rectangle": front_inner,
@@ -165,6 +166,7 @@ def analyze_centering(front_path: str, back_path: str) -> dict:
             "ratio_string": frontRatioString,
             "ratio_value": frontRatioValue
         },
+
         "back": {
             "outer_border": back_outer,
             "artwork_rectangle": back_inner,
