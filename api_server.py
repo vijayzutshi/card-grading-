@@ -45,13 +45,13 @@ def analyze(req: CenteringRequest):
 
     # Return clean JSON response
     return JSONResponse(content={
-        "success": True,
-        "card_id": req.card_id,
-        "psa_grade": result.get("psa_grade"),
-        "ratio": result.get("ratio"),
-        "centered": result.get("centered")
-    })
+    "success": True,
+    "card_id": req.card_id,
+    **result  # merge full result dictionary
+})
+
 
   
+
 
 
