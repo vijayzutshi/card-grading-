@@ -113,7 +113,7 @@ def map_psa_centering_grade(front_ratio, back_ratio):
     return 4
 
 # ---------------------------------------------------------
-# 6. FINAL FUNCTION — FULL RESPONSE RESTORED
+# 6. FINAL FUNCTION — WITH TOP-LEVEL FIELDS YOU NEED
 # ---------------------------------------------------------
 def analyze_centering(front_path: str, back_path: str) -> dict:
 
@@ -151,12 +151,24 @@ def analyze_centering(front_path: str, back_path: str) -> dict:
     backRatioString = f"{int(back_left)}/{int(back_right)}"
     backRatioValue = back_right / 100.0
 
-    # ---------------- RESULT — FULL STRUCTURE ----------------
+    # ---------------- RESULT — FULL STRUCTURE + TOP-LEVEL FIELDS ----------------
     return {
         "psa_grade": f"Gem Mint {centering_grade}",
         "ratio": round(front_center_ratio, 2),
         "centered": front_center_ratio >= 45.0,
 
+        # REQUIRED TOP-LEVEL FIELDS
+        "frontCenteringRatio": front_center_ratio,
+        "frontRatioString": frontRatioString,
+        "frontRatioValue": frontRatioValue,
+
+        "backCenteringRatio": back_center_ratio,
+        "backRatioString": backRatioString,
+        "backRatioValue": backRatioValue,
+
+        "centeringGrade": centering_grade,
+
+        # ORIGINAL FULL STRUCTURE (unchanged)
         "front": {
             "outer_border": front_outer,
             "artwork_rectangle": front_inner,
